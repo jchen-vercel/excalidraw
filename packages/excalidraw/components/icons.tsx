@@ -361,8 +361,8 @@ export const EllipseIcon = createIcon(
 export const StickyNoteIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M5 5 h11 v11 h-11 z" />
-    <path d="M16 5 L19 8" />
+    <path d="M4 4 L15 4 L19 8 L19 19 L4 19 Z" />
+    <path d="M15 4 L19 8" />
   </g>,
   tablerIconProps,
 );
