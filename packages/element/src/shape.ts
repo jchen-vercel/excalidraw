@@ -78,6 +78,9 @@ import type {
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 
+const getStickyNoteFoldSize = (width: number, height: number) =>
+  Math.max(12, Math.min(width, height) * 0.2);
+
 export class ShapeCache {
   private static rg = new RoughGenerator();
   private static cache = new WeakMap<
@@ -227,6 +230,7 @@ export const generateRoughOptions = (
 
   switch (element.type) {
     case "rectangle":
+    case "stickyNote":
     case "iframe":
     case "embeddable":
     case "diamond":
@@ -818,6 +822,38 @@ const _generateElementShape = (
       }
       return shape;
     }
+    case "stickyNote": {
+      const { width: w, height: h } = element;
+      const fold = getStickyNoteFoldSize(w, h);
+      const roughOptions = generateRoughOptions(element, true, isDarkMode);
+      const foldLineOptions = {
+        ...roughOptions,
+        fill: undefined,
+        fillStyle: undefined,
+      };
+
+      if (element.roundness) {
+        const r = getCornerRadius(Math.min(w, h), element);
+        const bodyPath = `M ${r} 0 L ${w - fold} 0 L ${w} ${fold} L ${w} ${
+          h - r
+        } Q ${w} ${h}, ${w - r} ${h} L ${r} ${h} Q 0 ${h}, 0 ${
+          h - r
+        } L 0 ${r} Q 0 0, ${r} 0`;
+        return [
+          generator.path(bodyPath, roughOptions),
+          generator.path(
+            `M ${w - fold} 0 L ${w} ${fold}`,
+            foldLineOptions,
+          ),
+        ];
+      }
+
+      const bodyPath = `M 0 0 L ${w - fold} 0 L ${w} ${fold} L ${w} ${h} L 0 ${h} Z`;
+      return [
+        generator.path(bodyPath, roughOptions),
+        generator.path(`M ${w - fold} 0 L ${w} ${fold}`, foldLineOptions),
+      ];
+    }
     case "diamond": {
       let shape: ElementShapes[typeof element.type];
 
@@ -1079,6 +1115,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
 ): GeometricShape<Point> => {
   switch (element.type) {
     case "rectangle":
+    case "stickyNote":
     case "diamond":
     case "frame":
     case "magicframe":

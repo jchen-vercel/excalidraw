@@ -532,6 +532,62 @@ describe("restoreElements", () => {
     expect(restoredLine_1.y).toBe(lineElement_1.y + offsetY);
   });
 
+  it("should restore sticky note elements with styles and bindings", () => {
+    const stickyNote = API.createElement({
+      type: "stickyNote",
+      fillStyle: "cross-hatch",
+      strokeWidth: 2,
+      strokeStyle: "dashed",
+      roughness: 2,
+      opacity: 80,
+      x: 10,
+      y: 20,
+      strokeColor: "red",
+      backgroundColor: "blue",
+      width: 120,
+      height: 160,
+      groupIds: ["1"],
+    });
+    const text = API.createElement({
+      type: "text",
+      containerId: stickyNote.id,
+      text: "note",
+      x: 20,
+      y: 30,
+      width: 80,
+      height: 20,
+    });
+    const stickyNoteWithBinding = newElementWith(stickyNote, {
+      boundElements: [{ type: "text", id: text.id }],
+    });
+
+    const restored = restore.restoreElements(
+      [stickyNoteWithBinding, text],
+      null,
+    );
+
+    expect(restored).toHaveLength(2);
+    expect(restored[0]).toEqual(
+      expect.objectContaining({
+        type: "stickyNote",
+        width: 120,
+        height: 160,
+        strokeColor: "red",
+        backgroundColor: "blue",
+        fillStyle: "cross-hatch",
+        strokeStyle: "dashed",
+        boundElements: [{ type: "text", id: text.id }],
+      }),
+    );
+    expect(restored[1]).toEqual(
+      expect.objectContaining({
+        type: "text",
+        containerId: stickyNote.id,
+        text: "note",
+      }),
+    );
+  });
+
   it("should restore correctly with rectangle, ellipse and diamond elements", () => {
     const types = ["rectangle", "ellipse", "diamond"];
 
