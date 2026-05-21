@@ -67,6 +67,7 @@ import type {
   ExcalidrawEllipseElement,
   ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
+  ExcalidrawStickyNoteElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
@@ -86,6 +87,7 @@ import {
   EllipseIcon,
   LineIcon,
   RectangleIcon,
+  StickyNoteIcon,
   roundArrowIcon,
   sharpArrowIcon,
 } from "./icons";
@@ -101,10 +103,16 @@ type ExcalidrawConvertibleElement =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawLinearElement;
 
 // indicates order of switching
-const GENERIC_TYPES = ["rectangle", "diamond", "ellipse"] as const;
+const GENERIC_TYPES = [
+  "rectangle",
+  "diamond",
+  "ellipse",
+  "stickyNote",
+] as const;
 // indicates order of switching
 const LINEAR_TYPES = [
   "line",
@@ -303,6 +311,7 @@ const Panel = ({
           ["rectangle", RectangleIcon],
           ["diamond", DiamondIcon],
           ["ellipse", EllipseIcon],
+          ["stickyNote", StickyNoteIcon],
         ]
       : [];
 

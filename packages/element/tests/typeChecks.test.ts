@@ -26,6 +26,15 @@ describe("Test TypeChecks", () => {
       expect(
         hasBoundTextElement(
           API.createElement({
+            type: "stickyNote",
+            boundElements: [{ type: "text", id: "text-id" }],
+          }),
+        ),
+      ).toBeTruthy();
+
+      expect(
+        hasBoundTextElement(
+          API.createElement({
             type: "arrow",
             boundElements: [{ type: "text", id: "text-id" }],
           }),

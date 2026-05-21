@@ -177,6 +177,46 @@ const renderElementToSvg = (
       addToRoot(g || node, element);
       break;
     }
+    case "stickyNote": {
+      const shapes = ShapeCache.generateElementShape(element, renderConfig);
+      const nodes: SVGElement[] = [];
+      shapes.forEach((shape) => {
+        const node = roughSVGDrawWithPrecision(
+          rsvg,
+          shape,
+          MAX_DECIMALS_FOR_SVG_EXPORT,
+        );
+        if (opacity !== 1) {
+          node.setAttribute("stroke-opacity", `${opacity}`);
+          node.setAttribute("fill-opacity", `${opacity}`);
+        }
+        node.setAttribute("stroke-linecap", "round");
+        node.setAttribute(
+          "transform",
+          `translate(${offsetX || 0} ${
+            offsetY || 0
+          }) rotate(${degree} ${cx} ${cy})`,
+        );
+        nodes.push(node);
+      });
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        nodes,
+        renderConfig.frameRendering,
+        elementsMap,
+      );
+
+      const rootNode = g || nodes[0];
+      addToRoot(rootNode, element);
+      if (!g) {
+        for (let i = 1; i < nodes.length; i++) {
+          root.appendChild(nodes[i]);
+        }
+      }
+      break;
+    }
     case "iframe":
     case "embeddable": {
       // render placeholder rectangle

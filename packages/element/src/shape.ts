@@ -230,7 +230,8 @@ export const generateRoughOptions = (
     case "iframe":
     case "embeddable":
     case "diamond":
-    case "ellipse": {
+    case "ellipse":
+    case "stickyNote": {
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
         ? undefined
@@ -875,6 +876,26 @@ const _generateElementShape = (
       );
       return shape;
     }
+    case "stickyNote": {
+      const w = element.width;
+      const h = element.height;
+      const foldSize = Math.min(Math.min(w, h) * 0.2, 28);
+      const fillOptions = generateRoughOptions(element, true, isDarkMode);
+      const strokeOptions = generateRoughOptions(element, false, isDarkMode);
+
+      const bodyPath = `M 0 0 L ${
+        w - foldSize
+      } 0 L ${w} ${foldSize} L ${w} ${h} L 0 ${h} Z`;
+      const foldPath = `M ${w - foldSize} 0 L ${w} 0 L ${w} ${foldSize} Z`;
+      const foldLinePath = `M ${w - foldSize} 0 L ${w} ${foldSize}`;
+
+      const shape: ElementShapes[typeof element.type] = [
+        generator.path(bodyPath, fillOptions),
+        generator.path(foldPath, fillOptions),
+        generator.path(foldLinePath, strokeOptions),
+      ];
+      return shape;
+    }
     case "line":
     case "arrow": {
       let shape: ElementShapes[typeof element.type];
@@ -1080,6 +1101,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
   switch (element.type) {
     case "rectangle":
     case "diamond":
+    case "stickyNote":
     case "frame":
     case "magicframe":
     case "embeddable":

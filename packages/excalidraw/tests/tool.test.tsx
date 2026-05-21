@@ -40,6 +40,11 @@ describe("setActiveTool()", () => {
     });
     expect(h.state.activeTool.type).toBe("rectangle");
 
+    act(() => {
+      excalidrawAPI.setActiveTool({ type: "stickyNote" });
+    });
+    expect(h.state.activeTool.type).toBe("stickyNote");
+
     mouse.down(10, 10);
     mouse.up(20, 20);
 
@@ -90,5 +95,11 @@ describe("getToolbarTools()", () => {
 
     expect(toolValues.filter((value) => value === "lasso")).toHaveLength(1);
     expect(toolValues.filter((value) => value === "selection")).toHaveLength(0);
+  });
+
+  it("includes sticky note in toolbar tools", () => {
+    const toolValues = getToolValues("selection");
+
+    expect(toolValues).toContain("stickyNote");
   });
 });
