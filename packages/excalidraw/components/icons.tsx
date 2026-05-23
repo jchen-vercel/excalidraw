@@ -358,6 +358,15 @@ export const EllipseIcon = createIcon(
   tablerIconProps,
 );
 
+export const StickyNoteIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M5 5h10l4 4v10h-14z" />
+    <path d="M15 5l4 4" fill="none" />
+  </g>,
+  tablerIconProps,
+);
+
 // tabler-icons: arrow-narrow-right
 export const ArrowIcon = createIcon(
   <g strokeWidth="1.5">

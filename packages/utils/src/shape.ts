@@ -49,6 +49,7 @@ import type {
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
+  ExcalidrawStickyNoteElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
@@ -104,6 +105,7 @@ export type GeometricShape<Point extends GlobalPoint | LocalPoint> =
 
 type RectangularElement =
   | ExcalidrawRectangleElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawDiamondElement
   | ExcalidrawFrameLikeElement
   | ExcalidrawEmbeddableElement
@@ -131,6 +133,16 @@ export const getPolygonShape = <Point extends GlobalPoint | LocalPoint>(
       pointRotateRads(pointFrom(x + width, cy), center, angle),
       pointRotateRads(pointFrom(cx, y + height), center, angle),
       pointRotateRads(pointFrom(x, cy), center, angle),
+    );
+  } else if (element.type === "stickyNote") {
+    const minDim = Math.min(width, height);
+    const fold = Math.min(minDim * 0.18, minDim * 0.45);
+    data = polygon(
+      pointRotateRads(pointFrom(x, y), center, angle),
+      pointRotateRads(pointFrom(x + width - fold, y), center, angle),
+      pointRotateRads(pointFrom(x + width, y + fold), center, angle),
+      pointRotateRads(pointFrom(x + width, y + height), center, angle),
+      pointRotateRads(pointFrom(x, y + height), center, angle),
     );
   } else {
     data = polygon(

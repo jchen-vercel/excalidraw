@@ -230,7 +230,8 @@ export const generateRoughOptions = (
     case "iframe":
     case "embeddable":
     case "diamond":
-    case "ellipse": {
+    case "ellipse":
+    case "stickyNote": {
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
         ? undefined
@@ -370,6 +371,11 @@ const generateArrowheadOutlineCircle = (
   delete circleOptions.strokeLineDash;
 
   return [generator.circle(x, y, diameter * diameterScale, circleOptions)];
+};
+
+const getStickyNoteFoldSize = (width: number, height: number) => {
+  const minDim = Math.min(width, height);
+  return Math.min(minDim * 0.18, minDim * 0.45);
 };
 
 const getArrowheadShapes = (
@@ -875,6 +881,26 @@ const _generateElementShape = (
       );
       return shape;
     }
+    case "stickyNote": {
+      const w = element.width;
+      const h = element.height;
+      const f = getStickyNoteFoldSize(w, h);
+      const body = generator.path(
+        `M 0 0 L ${w - f} 0 L ${w} ${f} L ${w} ${h} L 0 ${h} Z`,
+        generateRoughOptions(element, true, isDarkMode),
+      );
+      const foldLine = generator.line(
+        w - f,
+        0,
+        w,
+        f,
+        {
+          ...generateRoughOptions(element, false, isDarkMode),
+          fill: undefined,
+        },
+      );
+      return [body, foldLine];
+    }
     case "line":
     case "arrow": {
       let shape: ElementShapes[typeof element.type];
@@ -1080,6 +1106,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
   switch (element.type) {
     case "rectangle":
     case "diamond":
+    case "stickyNote":
     case "frame":
     case "magicframe":
     case "embeddable":
