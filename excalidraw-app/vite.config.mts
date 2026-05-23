@@ -8,15 +8,28 @@ import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
 import Sitemap from "vite-plugin-sitemap";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
+import { assistantApiDevPlugin } from "./vite-plugins/assistantApiDevPlugin";
+
 export default defineConfig(({ mode }) => {
   // To load .env variables
   const envVars = loadEnv(mode, `../`);
+  const useAssistantDevProxy = Boolean(envVars.VITE_APP_ASSISTANT_DEV_PROXY);
   // https://vitejs.dev/config/
   return {
     server: {
       port: Number(envVars.VITE_APP_PORT || 3000),
       // open the browser
       open: true,
+      ...(useAssistantDevProxy
+        ? {
+            proxy: {
+              "/api": {
+                target: envVars.VITE_APP_ASSISTANT_DEV_PROXY,
+                changeOrigin: true,
+              },
+            },
+          }
+        : {}),
     },
     // We need to specify the envDir since now there are no
     //more located in parallel with the vite.config.ts file but in parent dir
@@ -125,6 +138,7 @@ export default defineConfig(({ mode }) => {
       assetsInlineLimit: 0,
     },
     plugins: [
+      ...(!useAssistantDevProxy ? [assistantApiDevPlugin()] : []),
       Sitemap({
         hostname: "https://excalidraw.com",
         outDir: "build",

@@ -21,6 +21,7 @@ import { ShareableLinkDialog } from "@excalidraw/excalidraw/components/Shareable
 import Trans from "@excalidraw/excalidraw/components/Trans";
 import {
   APP_NAME,
+  DEFAULT_SIDEBAR,
   EVENT,
   THEME,
   VERSION_TIMEOUT,
@@ -47,6 +48,7 @@ import {
   exportToPlus,
   share,
   youtubeIcon,
+  brainIconThin,
 } from "@excalidraw/excalidraw/components/icons";
 import { isElementLink } from "@excalidraw/element";
 import {
@@ -147,6 +149,7 @@ import "./index.scss";
 
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
+import { ASSISTANT_SIDEBAR_TAB } from "./components/AssistantSidebar";
 
 import type { CollabAPI } from "./collab/Collab";
 
@@ -1067,6 +1070,28 @@ const ExcalidrawWrapper = () => {
 
         <CommandPalette
           customCommandPaletteItems={[
+            {
+              label: "Excalidraw Assistant",
+              category: DEFAULT_CATEGORIES.app,
+              keywords: [
+                "assistant",
+                "ai",
+                "help",
+                "shortcuts",
+                "keyboard",
+                "best practices",
+                "tips",
+                "how to",
+              ],
+              icon: brainIconThin,
+              perform: () => {
+                excalidrawAPI?.toggleSidebar({
+                  name: DEFAULT_SIDEBAR.name,
+                  tab: ASSISTANT_SIDEBAR_TAB,
+                  force: true,
+                });
+              },
+            },
             {
               label: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
