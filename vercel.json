@@ -69,7 +69,8 @@
   "installCommand": "yarn install",
   "functions": {
     "api/excalidraw-assistant.ts": {
-      "includeFiles": "api/knowledge/excalidraw-documentation.md"
+      "includeFiles": "api/knowledge/excalidraw-documentation.md",
+      "maxDuration": 60
     }
   }
 }

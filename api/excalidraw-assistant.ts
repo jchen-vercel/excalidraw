@@ -3,60 +3,72 @@ import {
   streamAssistantResponse,
   validateMessages,
 } from "./lib/assistant-core";
-import { setStreamHeaders, writeStreamChunk } from "./lib/stream-utils";
 
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+export const maxDuration = 60;
 
-function setCorsHeaders(res: VercelResponse) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept");
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Accept",
+};
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
 }
 
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse,
-) {
-  setCorsHeaders(res);
-
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  const messages = validateMessages(req.body);
-
-  if (!messages) {
-    return res.status(400).json({ error: "Invalid messages payload" });
-  }
+export async function POST(request: Request) {
+  let body: unknown;
 
   try {
-    setStreamHeaders(res);
-
-    await streamAssistantResponse(messages, (chunk) => {
-      writeStreamChunk(res, chunk);
-    });
-
-    return res.status(200).end();
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Assistant request failed";
-
-    if (!res.headersSent) {
-      return res.status(500).json({ error: message });
-    }
-
-    writeStreamChunk(
-      res,
-      formatSSE({
-        type: "error",
-        error: { message, status: 500 },
-      }),
-    );
-    writeStreamChunk(res, formatSSE("[DONE]"));
-    return res.status(200).end();
+    body = await request.json();
+  } catch {
+    return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
+
+  const messages = validateMessages(body);
+
+  if (!messages) {
+    return Response.json({ error: "Invalid messages payload" }, { status: 400 });
+  }
+
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const write = (chunk: string) => {
+        controller.enqueue(encoder.encode(chunk));
+      };
+
+      try {
+        await streamAssistantResponse(messages, write);
+        controller.close();
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Assistant request failed";
+
+        write(
+          formatSSE({
+            type: "error",
+            error: { message, status: 500 },
+          }),
+        );
+        write(formatSSE("[DONE]"));
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    status: 200,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive",
+      "X-Accel-Buffering": "no",
+    },
+  });
 }
