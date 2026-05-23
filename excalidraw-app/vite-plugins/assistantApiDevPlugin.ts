@@ -2,11 +2,6 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 
 import { loadEnv, type Plugin } from "vite";
 
-import {
-  setStreamHeaders,
-  writeStreamChunk,
-} from "../../api/lib/stream-utils";
-
 const ASSISTANT_API_PATH = "/api/excalidraw-assistant";
 
 const readJsonBody = (req: IncomingMessage): Promise<unknown> =>
@@ -39,6 +34,20 @@ const setCorsHeaders = (res: ServerResponse) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept");
 };
 
+const setStreamHeaders = (res: ServerResponse) => {
+  res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
+  res.setHeader("Cache-Control", "no-cache, no-transform");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
+};
+
+const writeStreamChunk = (res: ServerResponse, chunk: string) => {
+  res.write(chunk);
+
+  const flushable = res as ServerResponse & { flush?: () => void };
+  flushable.flush?.();
+};
+
 export function assistantApiDevPlugin(): Plugin {
   let assistantCorePromise: Promise<{
     formatSSE: (payload: Record<string, unknown> | "[DONE]") => string;
@@ -54,7 +63,7 @@ export function assistantApiDevPlugin(): Plugin {
 
   const loadAssistantCore = () => {
     if (!assistantCorePromise) {
-      assistantCorePromise = import("../../api/lib/assistant-core");
+      assistantCorePromise = import("../../api/excalidraw-assistant");
     }
     return assistantCorePromise;
   };
