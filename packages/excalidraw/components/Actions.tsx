@@ -1097,11 +1097,13 @@ export const ShapesSwitcher = ({
           const label = t(`toolBar.${value}`);
           const letter =
             key && capitalizeString(typeof key === "string" ? key : key[0]);
-          const shortcut = letter
-            ? `${letter} ${t("helpDialog.or")} ${numericKey}`
-            : `${numericKey}`;
+          const shortcut = numericKey
+            ? letter
+              ? `${letter} ${t("helpDialog.or")} ${numericKey}`
+              : `${numericKey}`
+            : letter ?? "";
           const keybindingLabel =
-            value === "hand" ? undefined : numericKey || letter;
+            value === "hand" ? undefined : numericKey ?? letter ?? undefined;
 
           // when in compact styles panel mode (tablet)
           // use a ToolPopover for selection/lasso toggle as well

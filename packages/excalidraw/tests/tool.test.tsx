@@ -4,7 +4,8 @@ import { resolvablePromise } from "@excalidraw/common";
 
 import { Excalidraw } from "../index";
 
-import { getToolbarTools } from "../components/shapes";
+import { findShapeByKey, getToolbarTools } from "../components/shapes";
+import { KEYS } from "@excalidraw/common";
 
 import { Pointer } from "./helpers/ui";
 import { act, render } from "./test-utils";
@@ -66,6 +67,19 @@ describe("setActiveTool()", () => {
     });
     expect(h.state.activeTool.type).toBe("custom");
     expect(h.state.activeTool.customType).toBe("comment");
+  });
+
+  it("should set sticky note tool type", async () => {
+    act(() => {
+      excalidrawAPI.setActiveTool({ type: "stickyNote" });
+    });
+    expect(h.state.activeTool.type).toBe("stickyNote");
+  });
+});
+
+describe("sticky note toolbar", () => {
+  it("findShapeByKey returns stickyNote for N", () => {
+    expect(findShapeByKey(KEYS.N, window.h.app)).toBe("stickyNote");
   });
 });
 describe("getToolbarTools()", () => {

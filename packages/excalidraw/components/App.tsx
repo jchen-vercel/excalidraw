@@ -9492,13 +9492,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private getCurrentItemRoundness(
-    elementType:
-      | "selection"
-      | "rectangle"
-      | "diamond"
-      | "ellipse"
-      | "iframe"
-      | "embeddable",
+    elementType: ExcalidrawGenericElement["type"] | "embeddable" | "iframe",
   ) {
     return this.state.currentItemRoundness === "round"
       ? {

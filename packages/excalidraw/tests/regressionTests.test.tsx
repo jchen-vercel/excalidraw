@@ -145,6 +145,7 @@ describe("regression tests", () => {
     [`2${KEYS.R}`, "rectangle", true],
     [`3${KEYS.D}`, "diamond", true],
     [`4${KEYS.O}`, "ellipse", true],
+    [KEYS.N, "stickyNote", true],
     [`5${KEYS.A}`, "arrow", true],
     [`6${KEYS.L}`, "line", true],
     [`7${KEYS.P}`, "freedraw", false],

@@ -43,6 +43,77 @@ describe("restoreElements", () => {
     expect(restoredElements.length).toBe(elements.length);
   });
 
+  it("restores sticky note with styles, dimensions, and arrow binding", () => {
+    const stickyNote = API.createElement({
+      type: "stickyNote",
+      width: 200,
+      height: 150,
+      strokeColor: "#e03131",
+      backgroundColor: "#ffe066",
+      boundElements: [],
+    });
+    const arrowElement = API.createElement({
+      type: "arrow",
+      startBinding: {
+        elementId: stickyNote.id,
+        fixedPoint: [0.5, 0.5],
+        mode: "inside",
+      },
+    });
+
+    Object.assign(stickyNote, {
+      boundElements: [{ type: "arrow", id: arrowElement.id }],
+    });
+
+    const restoredElements = restore.restoreElements(
+      [stickyNote, arrowElement],
+      null,
+    );
+
+    expect(restoredElements).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: "stickyNote",
+          width: 200,
+          height: 150,
+          strokeColor: "#e03131",
+          backgroundColor: "#ffe066",
+        }),
+        expect.objectContaining({
+          id: arrowElement.id,
+          startBinding: expect.objectContaining({
+            elementId: stickyNote.id,
+          }),
+        }),
+      ]),
+    );
+  });
+
+  it("restores sticky note with bound text", () => {
+    const stickyNote = API.createElement({ type: "stickyNote" });
+    const boundText = API.createElement({
+      type: "text",
+      containerId: stickyNote.id,
+      text: "Sticky note text",
+    });
+
+    const restoredElements = restore.restoreElements(
+      [stickyNote, boundText],
+      null,
+    );
+
+    const restoredSticky = restoredElements.find(
+      (element) => element.type === "stickyNote",
+    );
+    const restoredText = restoredElements.find(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElement;
+
+    expect(restoredSticky).toBeDefined();
+    expect(restoredText.containerId).toBe(stickyNote.id);
+    expect(restoredText.text).toBe("Sticky note text");
+  });
+
   it("when imported data state is null it should return an empty array of elements", () => {
     const restoredElements = restore.restoreElements(null, null);
     expect(restoredElements.length).toBe(0);

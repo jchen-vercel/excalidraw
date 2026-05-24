@@ -184,6 +184,7 @@ export const isBindableElement = (
     (element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
+      element.type === "stickyNote" ||
       element.type === "image" ||
       element.type === "iframe" ||
       element.type === "embeddable" ||
@@ -200,6 +201,7 @@ export const isRectanguloidElement = (
     element != null &&
     (element.type === "rectangle" ||
       element.type === "diamond" ||
+      element.type === "stickyNote" ||
       element.type === "image" ||
       element.type === "iframe" ||
       element.type === "embeddable" ||
@@ -217,6 +219,7 @@ export const isRectangularElement = (
   return (
     element != null &&
     (element.type === "rectangle" ||
+      element.type === "stickyNote" ||
       element.type === "image" ||
       element.type === "text" ||
       element.type === "iframe" ||
@@ -237,6 +240,7 @@ export const isTextBindableContainer = (
     (element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
+      element.type === "stickyNote" ||
       isArrowElement(element))
   );
 };
@@ -255,6 +259,7 @@ export const isExcalidrawElement = (
     case "iframe":
     case "embeddable":
     case "ellipse":
+    case "stickyNote":
     case "arrow":
     case "freedraw":
     case "line":
@@ -277,7 +282,8 @@ export const isFlowchartNodeElement = (
   return (
     element.type === "rectangle" ||
     element.type === "ellipse" ||
-    element.type === "diamond"
+    element.type === "diamond" ||
+    element.type === "stickyNote"
   );
 };
 
@@ -398,6 +404,7 @@ export const isEligibleFrameChildType = (type: ElementOrToolType) => {
     case "rectangle":
     case "diamond":
     case "ellipse":
+    case "stickyNote":
     case "arrow":
     case "line":
     case "freedraw":

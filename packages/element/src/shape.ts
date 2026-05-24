@@ -230,7 +230,8 @@ export const generateRoughOptions = (
     case "iframe":
     case "embeddable":
     case "diamond":
-    case "ellipse": {
+    case "ellipse":
+    case "stickyNote": {
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
         ? undefined
@@ -370,6 +371,16 @@ const generateArrowheadOutlineCircle = (
   delete circleOptions.strokeLineDash;
 
   return [generator.circle(x, y, diameter * diameterScale, circleOptions)];
+};
+
+const getStickyNoteFoldSize = (width: number, height: number) => {
+  const minDim = Math.min(width, height);
+  return Math.min(minDim * 0.18, minDim * 0.45);
+};
+
+const getStickyNoteThumbtackRadius = (width: number, height: number) => {
+  const minDim = Math.min(width, height);
+  return Math.max(2, Math.min(minDim * 0.07, 10));
 };
 
 const getArrowheadShapes = (
@@ -875,6 +886,42 @@ const _generateElementShape = (
       );
       return shape;
     }
+    case "stickyNote": {
+      const w = element.width;
+      const h = element.height;
+      const f = getStickyNoteFoldSize(w, h);
+      const pinR = getStickyNoteThumbtackRadius(w, h);
+      const pinCx = w / 2;
+      const body = generator.path(
+        `M 0 0 L ${w} 0 L ${w} ${h - f} L ${w - f} ${h} L 0 ${h} Z`,
+        generateRoughOptions(element, true, isDarkMode),
+      );
+      const lineOptions = {
+        ...generateRoughOptions(element, false, isDarkMode),
+        fill: undefined,
+      };
+      const foldLine = generator.line(w, h - f, w - f, h, lineOptions);
+      const pinOptions = {
+        ...generateRoughOptions(element, false, isDarkMode),
+        fill: lineOptions.stroke,
+        fillStyle: "solid" as const,
+        roughness: Math.min(0.5, element.roughness ?? 1),
+      };
+      const pinShaft = generator.line(
+        pinCx,
+        pinR * 1.5,
+        pinCx,
+        pinR * 3.5,
+        lineOptions,
+      );
+      const pinHead = generator.circle(
+        pinCx,
+        pinR,
+        pinR * 2,
+        pinOptions,
+      );
+      return [body, foldLine, pinShaft, pinHead];
+    }
     case "line":
     case "arrow": {
       let shape: ElementShapes[typeof element.type];
@@ -1080,6 +1127,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
   switch (element.type) {
     case "rectangle":
     case "diamond":
+    case "stickyNote":
     case "frame":
     case "magicframe":
     case "embeddable":
