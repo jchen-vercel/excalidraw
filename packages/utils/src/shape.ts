@@ -139,9 +139,9 @@ export const getPolygonShape = <Point extends GlobalPoint | LocalPoint>(
     const fold = Math.min(minDim * 0.18, minDim * 0.45);
     data = polygon(
       pointRotateRads(pointFrom(x, y), center, angle),
-      pointRotateRads(pointFrom(x + width - fold, y), center, angle),
-      pointRotateRads(pointFrom(x + width, y + fold), center, angle),
-      pointRotateRads(pointFrom(x + width, y + height), center, angle),
+      pointRotateRads(pointFrom(x + width, y), center, angle),
+      pointRotateRads(pointFrom(x + width, y + height - fold), center, angle),
+      pointRotateRads(pointFrom(x + width - fold, y + height), center, angle),
       pointRotateRads(pointFrom(x, y + height), center, angle),
     );
   } else {

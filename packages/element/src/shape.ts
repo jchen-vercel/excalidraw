@@ -378,6 +378,11 @@ const getStickyNoteFoldSize = (width: number, height: number) => {
   return Math.min(minDim * 0.18, minDim * 0.45);
 };
 
+const getStickyNoteThumbtackRadius = (width: number, height: number) => {
+  const minDim = Math.min(width, height);
+  return Math.max(2, Math.min(minDim * 0.07, 10));
+};
+
 const getArrowheadShapes = (
   element: ExcalidrawLinearElement,
   shape: Drawable[],
@@ -885,21 +890,37 @@ const _generateElementShape = (
       const w = element.width;
       const h = element.height;
       const f = getStickyNoteFoldSize(w, h);
+      const pinR = getStickyNoteThumbtackRadius(w, h);
+      const pinCx = w / 2;
       const body = generator.path(
-        `M 0 0 L ${w - f} 0 L ${w} ${f} L ${w} ${h} L 0 ${h} Z`,
+        `M 0 0 L ${w} 0 L ${w} ${h - f} L ${w - f} ${h} L 0 ${h} Z`,
         generateRoughOptions(element, true, isDarkMode),
       );
-      const foldLine = generator.line(
-        w - f,
-        0,
-        w,
-        f,
-        {
-          ...generateRoughOptions(element, false, isDarkMode),
-          fill: undefined,
-        },
+      const lineOptions = {
+        ...generateRoughOptions(element, false, isDarkMode),
+        fill: undefined,
+      };
+      const foldLine = generator.line(w, h - f, w - f, h, lineOptions);
+      const pinOptions = {
+        ...generateRoughOptions(element, false, isDarkMode),
+        fill: lineOptions.stroke,
+        fillStyle: "solid" as const,
+        roughness: Math.min(0.5, element.roughness ?? 1),
+      };
+      const pinShaft = generator.line(
+        pinCx,
+        pinR * 1.5,
+        pinCx,
+        pinR * 3.5,
+        lineOptions,
       );
-      return [body, foldLine];
+      const pinHead = generator.circle(
+        pinCx,
+        pinR,
+        pinR * 2,
+        pinOptions,
+      );
+      return [body, foldLine, pinShaft, pinHead];
     }
     case "line":
     case "arrow": {
