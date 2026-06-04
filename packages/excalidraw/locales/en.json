@@ -723,6 +723,17 @@
     "itemNotAvailable": "Command is not available...",
     "shortcutHint": "For Command palette, use {{shortcut}}"
   },
+  "todos": {
+    "tab": "To-do list",
+    "addPlaceholder": "Add a to-do…",
+    "active": "Active",
+    "completed": "Completed",
+    "emptyActive": "No to-dos yet. Add one above.",
+    "emptyCompleted": "No completed to-dos.",
+    "delete": "Delete to-do",
+    "created": "Created",
+    "completedAt": "Completed"
+  },
   "keys": {
     "ctrl": "Ctrl",
     "option": "Option",

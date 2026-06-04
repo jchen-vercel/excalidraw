@@ -271,6 +271,14 @@ export type ObservedElementsAppState = {
 
 export type BoxSelectionMode = "contain" | "overlap";
 
+export type ExcalidrawTodo = {
+  id: string;
+  title: string;
+  completed: boolean;
+  createdAt: number;
+  completedAt: number | null;
+};
+
 export interface AppState {
   contextMenu: {
     items: ContextMenuItems;
@@ -482,6 +490,8 @@ export interface AppState {
   // a drag operation (like pointer position vs bindable element) but needed
   // globally for calculating the binding strategy
   bindMode: BindMode;
+  /** whiteboard todo list (persisted with scene export/local storage) */
+  todos: readonly ExcalidrawTodo[];
 }
 
 export type SearchMatch = {

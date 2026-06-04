@@ -86,6 +86,7 @@ import {
 import type {
   AppState,
   BinaryFiles,
+  ExcalidrawTodo,
   LibraryItem,
   NormalizedZoomValue,
 } from "../types";
@@ -1010,6 +1011,30 @@ const LegacyAppStateMigrations: {
   },
 };
 
+const sanitizeTodos = (todos: unknown): ExcalidrawTodo[] => {
+  if (!Array.isArray(todos)) {
+    return [];
+  }
+  return todos
+    .filter(
+      (todo): todo is ExcalidrawTodo =>
+        !!todo &&
+        typeof todo === "object" &&
+        typeof todo.id === "string" &&
+        typeof todo.title === "string" &&
+        typeof todo.completed === "boolean" &&
+        typeof todo.createdAt === "number" &&
+        (todo.completedAt === null || typeof todo.completedAt === "number"),
+    )
+    .map((todo) => ({
+      id: todo.id,
+      title: todo.title.trim() || "Untitled",
+      completed: todo.completed,
+      createdAt: todo.createdAt,
+      completedAt: todo.completed ? todo.completedAt ?? todo.createdAt : null,
+    }));
+};
+
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null | undefined,
@@ -1094,6 +1119,7 @@ export const restoreAppState = (
       isFiniteNumber(appState.gridStep) ? appState.gridStep : DEFAULT_GRID_STEP,
     ),
     editingFrame: null,
+    todos: sanitizeTodos(nextAppState.todos),
   };
 };
 
