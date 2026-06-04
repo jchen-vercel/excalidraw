@@ -1,10 +1,14 @@
 import { DefaultSidebar, Sidebar, THEME } from "@excalidraw/excalidraw";
 import {
+  checkIcon,
   messageCircleIcon,
   presentationIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { LinkButton } from "@excalidraw/excalidraw/components/LinkButton";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
+import { t } from "@excalidraw/excalidraw/i18n";
+
+import { TodoSidebar, TODOS_SIDEBAR_TAB } from "./TodoSidebar";
 
 import "./AppSidebar.scss";
 
@@ -14,6 +18,15 @@ export const AppSidebar = () => {
   return (
     <DefaultSidebar>
       <DefaultSidebar.TabTriggers>
+        <Sidebar.TabTrigger
+          tab={TODOS_SIDEBAR_TAB}
+          style={{
+            opacity: openSidebar?.tab === TODOS_SIDEBAR_TAB ? 1 : 0.4,
+          }}
+          title={t("todos.tab")}
+        >
+          {checkIcon}
+        </Sidebar.TabTrigger>
         <Sidebar.TabTrigger
           tab="comments"
           style={{ opacity: openSidebar?.tab === "comments" ? 1 : 0.4 }}
@@ -27,6 +40,9 @@ export const AppSidebar = () => {
           {presentationIcon}
         </Sidebar.TabTrigger>
       </DefaultSidebar.TabTriggers>
+      <Sidebar.Tab tab={TODOS_SIDEBAR_TAB}>
+        <TodoSidebar />
+      </Sidebar.Tab>
       <Sidebar.Tab tab="comments">
         <div className="app-sidebar-promo-container">
           <div
